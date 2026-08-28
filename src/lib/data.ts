@@ -150,7 +150,6 @@ export const events: Event[] = [
       lat: 40.72,
       lng: -74.01,
     },
-    rsvpStatus: undefined,
     goingCount: 9,
     maybeCount: 2,
     notGoingCount: 1,
