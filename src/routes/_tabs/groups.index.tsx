@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_tabs/groups")({
+export const Route = createFileRoute("/_tabs/groups/")({
   head: () => ({
     meta: [
       { title: "Groups — Sideline" },
