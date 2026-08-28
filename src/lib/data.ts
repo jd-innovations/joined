@@ -272,3 +272,95 @@ export function getWeatherForUser(): {
     location: "Springfield",
   };
 }
+
+export interface Member {
+  id: string;
+  groupId: string;
+  displayName: string;
+  role: "organizer" | "coach" | "player";
+  avatarUrl: string;
+  rsvp?: RsvpStatus;
+}
+
+export const members: Member[] = [
+  { id: "m1", groupId: "g1", displayName: "Jesus D.", role: "organizer", avatarUrl: "https://i.pravatar.cc/100?img=12", rsvp: "going" },
+  { id: "m2", groupId: "g1", displayName: "Marta R.", role: "coach", avatarUrl: "https://i.pravatar.cc/100?img=32", rsvp: "going" },
+  { id: "m3", groupId: "g1", displayName: "Leo P.", role: "player", avatarUrl: "https://i.pravatar.cc/100?img=15", rsvp: "maybe" },
+  { id: "m4", groupId: "g1", displayName: "Aisha K.", role: "player", avatarUrl: "https://i.pravatar.cc/100?img=45", rsvp: "going" },
+  { id: "m5", groupId: "g2", displayName: "Dre W.", role: "organizer", avatarUrl: "https://i.pravatar.cc/100?img=52", rsvp: "going" },
+  { id: "m6", groupId: "g2", displayName: "Nina S.", role: "player", avatarUrl: "https://i.pravatar.cc/100?img=27", rsvp: "not_going" },
+  { id: "m7", groupId: "g3", displayName: "Cody B.", role: "organizer", avatarUrl: "https://i.pravatar.cc/100?img=8", rsvp: "going" },
+  { id: "m8", groupId: "g3", displayName: "Priya M.", role: "player", avatarUrl: "https://i.pravatar.cc/100?img=41", rsvp: "maybe" },
+];
+
+export function getGroupById(id: string): Group | undefined {
+  return groups.find((g) => g.id === id);
+}
+
+export function getEventById(id: string): Event | undefined {
+  return events.find((e) => e.id === id);
+}
+
+export function getMembersForGroup(groupId: string): Member[] {
+  return members.filter((m) => m.groupId === groupId);
+}
+
+export function getEventsForGroup(groupId: string): Event[] {
+  return events
+    .filter((e) => e.groupId === groupId)
+    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+}
+
+export function getUpcomingEvents(groupId?: string): Event[] {
+  const now = Date.now();
+  return events
+    .filter((e) => new Date(e.endAt).getTime() >= now)
+    .filter((e) => (groupId ? e.groupId === groupId : true))
+    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+}
+
+export function getPastEvents(): Event[] {
+  const now = Date.now();
+  return events
+    .filter((e) => new Date(e.endAt).getTime() < now)
+    .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+}
+
+export function groupEventsByDay(list: Event[]): { label: string; events: Event[] }[] {
+  const buckets = new Map<string, Event[]>();
+  for (const e of list) {
+    const d = new Date(e.startAt);
+    const key = d.toDateString();
+    const arr = buckets.get(key);
+    if (arr) arr.push(e);
+    else buckets.set(key, [e]);
+  }
+  const today = new Date().toDateString();
+  const tomorrow = new Date(Date.now() + 86_400_000).toDateString();
+  return [...buckets.entries()].map(([key, evts]) => ({
+    label:
+      key === today
+        ? "Today"
+        : key === tomorrow
+          ? "Tomorrow"
+          : new Date(key).toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+            }),
+    events: evts,
+  }));
+}
+
+export function formatTimeOnly(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export const rsvpLabels: Record<RsvpStatus, string> = {
+  going: "Going",
+  maybe: "Maybe",
+  not_going: "Can't go",
+};

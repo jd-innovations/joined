@@ -17,7 +17,9 @@ import { Route as TabsMarketplaceRouteImport } from './routes/_tabs/marketplace'
 import { Route as TabsMeRouteImport } from './routes/_tabs/me'
 import { Route as TabsMessagesRouteImport } from './routes/_tabs/messages'
 import { Route as TabsScheduleRouteImport } from './routes/_tabs/schedule'
+import { Route as TabsGroupsIndexRouteImport } from './routes/_tabs/groups.index'
 import { Route as TabsGroupsGroupIdRouteImport } from './routes/_tabs/groups.$groupId'
+import { Route as TabsScheduleIndexRouteImport } from './routes/_tabs/schedule.index'
 import { Route as TabsScheduleEventIdRouteImport } from './routes/_tabs/schedule.$eventId'
 
 const TabsRoute = TabsRouteImport.update({
@@ -59,10 +61,20 @@ const TabsScheduleRoute = TabsScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsGroupsIndexRoute = TabsGroupsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TabsGroupsRoute,
+} as any)
 const TabsGroupsGroupIdRoute = TabsGroupsGroupIdRouteImport.update({
   id: '/$groupId',
   path: '/$groupId',
   getParentRoute: () => TabsGroupsRoute,
+} as any)
+const TabsScheduleIndexRoute = TabsScheduleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TabsScheduleRoute,
 } as any)
 const TabsScheduleEventIdRoute = TabsScheduleEventIdRouteImport.update({
   id: '/$eventId',
@@ -80,17 +92,19 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof TabsScheduleRouteWithChildren
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
+  '/groups/': typeof TabsGroupsIndexRoute
+  '/schedule/': typeof TabsScheduleIndexRoute
 }
 export interface FileRoutesByTo {
   '/alerts': typeof TabsAlertsRoute
-  '/groups': typeof TabsGroupsRouteWithChildren
   '/marketplace': typeof TabsMarketplaceRoute
   '/me': typeof TabsMeRoute
   '/messages': typeof TabsMessagesRoute
-  '/schedule': typeof TabsScheduleRouteWithChildren
   '/': typeof TabsIndexRoute
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
+  '/groups': typeof TabsGroupsIndexRoute
+  '/schedule': typeof TabsScheduleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +118,8 @@ export interface FileRoutesById {
   '/_tabs/': typeof TabsIndexRoute
   '/_tabs/groups/$groupId': typeof TabsGroupsGroupIdRoute
   '/_tabs/schedule/$eventId': typeof TabsScheduleEventIdRoute
+  '/_tabs/groups/': typeof TabsGroupsIndexRoute
+  '/_tabs/schedule/': typeof TabsScheduleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,17 +133,19 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/groups/$groupId'
     | '/schedule/$eventId'
+    | '/groups/'
+    | '/schedule/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/alerts'
-    | '/groups'
     | '/marketplace'
     | '/me'
     | '/messages'
-    | '/schedule'
     | '/'
     | '/groups/$groupId'
     | '/schedule/$eventId'
+    | '/groups'
+    | '/schedule'
   id:
     | '__root__'
     | '/_tabs'
@@ -140,6 +158,8 @@ export interface FileRouteTypes {
     | '/_tabs/'
     | '/_tabs/groups/$groupId'
     | '/_tabs/schedule/$eventId'
+    | '/_tabs/groups/'
+    | '/_tabs/schedule/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,12 +224,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsScheduleRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/groups/': {
+      id: '/_tabs/groups/'
+      path: '/'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof TabsGroupsIndexRouteImport
+      parentRoute: typeof TabsGroupsRoute
+    }
     '/_tabs/groups/$groupId': {
       id: '/_tabs/groups/$groupId'
       path: '/$groupId'
       fullPath: '/groups/$groupId'
       preLoaderRoute: typeof TabsGroupsGroupIdRouteImport
       parentRoute: typeof TabsGroupsRoute
+    }
+    '/_tabs/schedule/': {
+      id: '/_tabs/schedule/'
+      path: '/'
+      fullPath: '/schedule/'
+      preLoaderRoute: typeof TabsScheduleIndexRouteImport
+      parentRoute: typeof TabsScheduleRoute
     }
     '/_tabs/schedule/$eventId': {
       id: '/_tabs/schedule/$eventId'
@@ -223,10 +257,12 @@ declare module '@tanstack/react-router' {
 
 interface TabsGroupsRouteChildren {
   TabsGroupsGroupIdRoute: typeof TabsGroupsGroupIdRoute
+  TabsGroupsIndexRoute: typeof TabsGroupsIndexRoute
 }
 
 const TabsGroupsRouteChildren: TabsGroupsRouteChildren = {
   TabsGroupsGroupIdRoute: TabsGroupsGroupIdRoute,
+  TabsGroupsIndexRoute: TabsGroupsIndexRoute,
 }
 
 const TabsGroupsRouteWithChildren = TabsGroupsRoute._addFileChildren(
@@ -235,10 +271,12 @@ const TabsGroupsRouteWithChildren = TabsGroupsRoute._addFileChildren(
 
 interface TabsScheduleRouteChildren {
   TabsScheduleEventIdRoute: typeof TabsScheduleEventIdRoute
+  TabsScheduleIndexRoute: typeof TabsScheduleIndexRoute
 }
 
 const TabsScheduleRouteChildren: TabsScheduleRouteChildren = {
   TabsScheduleEventIdRoute: TabsScheduleEventIdRoute,
+  TabsScheduleIndexRoute: TabsScheduleIndexRoute,
 }
 
 const TabsScheduleRouteWithChildren = TabsScheduleRoute._addFileChildren(
