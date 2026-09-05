@@ -359,7 +359,7 @@ export function groupEventsByDay(list: Event[]): { label: string; events: Event[
   const today = utcDayKey(new Date());
   const tomorrow = utcDayKey(new Date(Date.now() + 86_400_000));
   return [...buckets.entries()].map(([key, evts]) => {
-    const d = new Date(evts[0].startAt);
+    const d = new Date(evts[0]!.startAt);
     return {
       label:
         key === today
