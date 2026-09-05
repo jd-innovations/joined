@@ -23,3 +23,5 @@ Status meaning currently comes from color (green = going, red = live, amber = wa
 - Two exceptions needing component-level touch-ups: the hardcoded emerald gradient on the home weather card (`from-brand-primary to-emerald-700`) and any `bg-white/20` overlays on photos — those get neutral equivalents.
 - Images are never filtered, so they stay in color automatically.
 - Optionally keep a "color theme" switch later; the tokens make reverting a one-file change.
+
+Make sure dark and light theme are considered as i expect to work

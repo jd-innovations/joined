@@ -85,7 +85,7 @@ function HomePage() {
 
       <div className="space-y-5 px-4 pb-6 pt-4">
         {/* Weather widget */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary to-emerald-700 p-5 text-on-brand-primary shadow-sm">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-800 to-black p-5 text-white shadow-sm">
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">{weather.location}</p>
@@ -139,7 +139,7 @@ function HomePage() {
                     {live.title}
                   </p>
                   {live.score && (
-                    <p className="mt-1 font-mono text-3xl font-bold text-brand-primary">
+                    <p className="mt-1 font-mono text-3xl font-bold text-foreground">
                       {live.score.us} — {live.score.them}
                     </p>
                   )}
@@ -165,7 +165,7 @@ function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
                 <div className="flex items-center gap-2 text-xs font-medium opacity-90">
-                  <span className="rounded-full bg-brand-primary/90 px-2 py-0.5 text-white">
+                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-white backdrop-blur-md">
                     {nextEvent.type}
                   </span>
                   <span>{formatRelativeTime(nextEvent.startAt)}</span>
