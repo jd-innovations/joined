@@ -239,6 +239,7 @@ export function getLiveActivities(): LiveActivity[] {
 export function formatEventTime(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleString("en-US", {
+    timeZone: "UTC",
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -354,6 +355,7 @@ export function groupEventsByDay(list: Event[]): { label: string; events: Event[
 
 export function formatTimeOnly(iso: string): string {
   return new Date(iso).toLocaleTimeString("en-US", {
+    timeZone: "UTC",
     hour: "numeric",
     minute: "2-digit",
   });
