@@ -113,14 +113,23 @@ export const groups: Group[] = [
   },
 ];
 
+// Anchor mock timestamps to UTC midnight so server and client renders agree.
+const utcMidnight = (() => {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d.getTime();
+})();
+const HOUR = 1000 * 60 * 60;
+const atUtcHour = (h: number) => new Date(utcMidnight + h * HOUR).toISOString();
+
 export const events: Event[] = [
   {
     id: "e1",
     groupId: "g1",
     title: "League Match vs Rangers",
     type: "game",
-    startAt: new Date(Date.now() + 1000 * 60 * 60 * 2).toISOString(), // 2h from now
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(),
+    startAt: atUtcHour(30),
+    endAt: atUtcHour(32),
     location: {
       name: "Memorial Field",
       address: "123 Main St, Springfield",
@@ -142,8 +151,8 @@ export const events: Event[] = [
     groupId: "g2",
     title: "Practice — Pick & Roll",
     type: "practice",
-    startAt: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 28).toISOString(),
+    startAt: atUtcHour(50),
+    endAt: atUtcHour(52),
     location: {
       name: "Sunset Rec Center",
       address: "456 Oak Ave, Springfield",
@@ -164,8 +173,8 @@ export const events: Event[] = [
     groupId: "g1",
     title: "Scrimmage — Inter-squad",
     type: "game",
-    startAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // live
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 1.5).toISOString(),
+    startAt: atUtcHour(20),
+    endAt: atUtcHour(47),
     location: {
       name: "Westside Park",
       address: "789 Pine Rd, Springfield",
