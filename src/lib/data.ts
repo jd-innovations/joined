@@ -341,38 +341,39 @@ export function getPastEvents(): Event[] {
     .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
 }
 
+const WEEKDAYS_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+
+function utcDayKey(d: Date): string {
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
+}
+
 export function groupEventsByDay(list: Event[]): { label: string; events: Event[] }[] {
   const buckets = new Map<string, Event[]>();
   for (const e of list) {
     const d = new Date(e.startAt);
-    const key = d.toDateString();
+    const key = utcDayKey(d);
     const arr = buckets.get(key);
     if (arr) arr.push(e);
     else buckets.set(key, [e]);
   }
-  const today = new Date().toDateString();
-  const tomorrow = new Date(Date.now() + 86_400_000).toDateString();
-  return [...buckets.entries()].map(([key, evts]) => ({
-    label:
-      key === today
-        ? "Today"
-        : key === tomorrow
-          ? "Tomorrow"
-          : new Date(key).toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-            }),
-    events: evts,
-  }));
+  const today = utcDayKey(new Date());
+  const tomorrow = utcDayKey(new Date(Date.now() + 86_400_000));
+  return [...buckets.entries()].map(([key, evts]) => {
+    const d = new Date(evts[0].startAt);
+    return {
+      label:
+        key === today
+          ? "Today"
+          : key === tomorrow
+            ? "Tomorrow"
+            : `${WEEKDAYS_LONG[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`,
+      events: evts,
+    };
+  });
 }
 
 export function formatTimeOnly(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-US", {
-    timeZone: "UTC",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatUtcClock(new Date(iso));
 }
 
 export const rsvpLabels: Record<RsvpStatus, string> = {
