@@ -113,14 +113,23 @@ export const groups: Group[] = [
   },
 ];
 
+// Anchor mock timestamps to UTC midnight so server and client renders agree.
+const utcMidnight = (() => {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d.getTime();
+})();
+const HOUR = 1000 * 60 * 60;
+const atUtcHour = (h: number) => new Date(utcMidnight + h * HOUR).toISOString();
+
 export const events: Event[] = [
   {
     id: "e1",
     groupId: "g1",
     title: "League Match vs Rangers",
     type: "game",
-    startAt: new Date(Date.now() + 1000 * 60 * 60 * 2).toISOString(), // 2h from now
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(),
+    startAt: atUtcHour(30),
+    endAt: atUtcHour(32),
     location: {
       name: "Memorial Field",
       address: "123 Main St, Springfield",
@@ -142,8 +151,8 @@ export const events: Event[] = [
     groupId: "g2",
     title: "Practice — Pick & Roll",
     type: "practice",
-    startAt: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 28).toISOString(),
+    startAt: atUtcHour(50),
+    endAt: atUtcHour(52),
     location: {
       name: "Sunset Rec Center",
       address: "456 Oak Ave, Springfield",
@@ -164,8 +173,8 @@ export const events: Event[] = [
     groupId: "g1",
     title: "Scrimmage — Inter-squad",
     type: "game",
-    startAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // live
-    endAt: new Date(Date.now() + 1000 * 60 * 60 * 1.5).toISOString(),
+    startAt: atUtcHour(20),
+    endAt: atUtcHour(47),
     location: {
       name: "Westside Park",
       address: "789 Pine Rd, Springfield",
@@ -236,25 +245,30 @@ export function getLiveActivities(): LiveActivity[] {
   return liveActivities;
 }
 
+// Deterministic UTC formatting — identical output on server and client.
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+
+function formatUtcClock(d: Date): string {
+  const h24 = d.getUTCHours();
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  const mins = String(d.getUTCMinutes()).padStart(2, "0");
+  const ampm = h24 < 12 ? "AM" : "PM";
+  return `${h12}:${mins} ${ampm}`;
+}
+
 export function formatEventTime(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleString("en-US", {
-    timeZone: "UTC",
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return `${WEEKDAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()} at ${formatUtcClock(d)}`;
 }
 
 export function formatRelativeTime(iso: string): string {
   const diffMs = new Date(iso).getTime() - Date.now();
-  const diffMins = Math.round(diffMs / (1000 * 60));
+  const diffMins = Math.floor(diffMs / (1000 * 60));
   if (diffMins < 60) return `${diffMins} min`;
-  const diffHours = Math.round(diffMins / 60);
+  const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h`;
-  const diffDays = Math.round(diffHours / 24);
+  const diffDays = Math.floor(diffHours / 24);
   return `${diffDays}d`;
 }
 
@@ -327,38 +341,39 @@ export function getPastEvents(): Event[] {
     .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
 }
 
+const WEEKDAYS_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+
+function utcDayKey(d: Date): string {
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
+}
+
 export function groupEventsByDay(list: Event[]): { label: string; events: Event[] }[] {
   const buckets = new Map<string, Event[]>();
   for (const e of list) {
     const d = new Date(e.startAt);
-    const key = d.toDateString();
+    const key = utcDayKey(d);
     const arr = buckets.get(key);
     if (arr) arr.push(e);
     else buckets.set(key, [e]);
   }
-  const today = new Date().toDateString();
-  const tomorrow = new Date(Date.now() + 86_400_000).toDateString();
-  return [...buckets.entries()].map(([key, evts]) => ({
-    label:
-      key === today
-        ? "Today"
-        : key === tomorrow
-          ? "Tomorrow"
-          : new Date(key).toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-            }),
-    events: evts,
-  }));
+  const today = utcDayKey(new Date());
+  const tomorrow = utcDayKey(new Date(Date.now() + 86_400_000));
+  return [...buckets.entries()].map(([key, evts]) => {
+    const d = new Date(evts[0]!.startAt);
+    return {
+      label:
+        key === today
+          ? "Today"
+          : key === tomorrow
+            ? "Tomorrow"
+            : `${WEEKDAYS_LONG[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`,
+      events: evts,
+    };
+  });
 }
 
 export function formatTimeOnly(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-US", {
-    timeZone: "UTC",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatUtcClock(new Date(iso));
 }
 
 export const rsvpLabels: Record<RsvpStatus, string> = {
