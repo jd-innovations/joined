@@ -245,25 +245,30 @@ export function getLiveActivities(): LiveActivity[] {
   return liveActivities;
 }
 
+// Deterministic UTC formatting — identical output on server and client.
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+
+function formatUtcClock(d: Date): string {
+  const h24 = d.getUTCHours();
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  const mins = String(d.getUTCMinutes()).padStart(2, "0");
+  const ampm = h24 < 12 ? "AM" : "PM";
+  return `${h12}:${mins} ${ampm}`;
+}
+
 export function formatEventTime(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleString("en-US", {
-    timeZone: "UTC",
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return `${WEEKDAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()} at ${formatUtcClock(d)}`;
 }
 
 export function formatRelativeTime(iso: string): string {
   const diffMs = new Date(iso).getTime() - Date.now();
-  const diffMins = Math.round(diffMs / (1000 * 60));
+  const diffMins = Math.floor(diffMs / (1000 * 60));
   if (diffMins < 60) return `${diffMins} min`;
-  const diffHours = Math.round(diffMins / 60);
+  const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h`;
-  const diffDays = Math.round(diffHours / 24);
+  const diffDays = Math.floor(diffHours / 24);
   return `${diffDays}d`;
 }
 
