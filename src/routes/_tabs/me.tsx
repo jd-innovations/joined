@@ -15,11 +15,11 @@ export const Route = createFileRoute("/_tabs/me")({
   component: MePage,
 });
 
-const TEXT_SIZES: { value: TextSize; label: string; glyph: string }[] = [
-  { value: "small", label: "Small", glyph: "text-xs" },
-  { value: "default", label: "Default", glyph: "text-sm" },
-  { value: "large", label: "Large", glyph: "text-base" },
-  { value: "xlarge", label: "XL", glyph: "text-lg" },
+const TEXT_SIZES: { value: TextSize; label: string; glyphPx: number }[] = [
+  { value: "small", label: "Small", glyphPx: 12 },
+  { value: "default", label: "Default", glyphPx: 15 },
+  { value: "large", label: "Large", glyphPx: 18 },
+  { value: "xlarge", label: "XL", glyphPx: 22 },
 ];
 
 function MePage() {
@@ -72,7 +72,12 @@ function MePage() {
                   : "bg-surface-tertiary text-on-surface-secondary hover:bg-surface-tertiary/80"
               }`}
             >
-              <span className={`font-bold leading-none ${s.glyph}`}>A</span>
+              <span
+                className="font-bold leading-none"
+                style={{ fontSize: s.glyphPx }}
+              >
+                A
+              </span>
               <span className="text-[10px] font-semibold">{s.label}</span>
             </button>
           ))}
