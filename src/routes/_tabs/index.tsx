@@ -85,7 +85,7 @@ function HomePage() {
 
       <div className="space-y-5 px-4 pb-6 pt-4">
         {/* Weather widget */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-800 to-black p-5 text-white shadow-sm">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface-inverse via-surface-inverse to-surface-tertiary p-5 text-on-surface-inverse shadow-sm">
           <div className="relative z-10 flex items-start justify-between">
             <div>
               <p className="text-sm font-medium opacity-90">{weather.location}</p>
