@@ -21,6 +21,7 @@ import { Route as TabsScheduleRouteImport } from './routes/_tabs/schedule'
 import { Route as TabsGroupsIndexRouteImport } from './routes/_tabs/groups.index'
 import { Route as TabsGroupsGroupIdRouteImport } from './routes/_tabs/groups.$groupId'
 import { Route as TabsMessagesIndexRouteImport } from './routes/_tabs/messages.index'
+import { Route as TabsMessagesConversationIdRouteImport } from './routes/_tabs/messages.$conversationId'
 import { Route as TabsScheduleIndexRouteImport } from './routes/_tabs/schedule.index'
 import { Route as TabsScheduleEventIdRouteImport } from './routes/_tabs/schedule.$eventId'
 
@@ -83,6 +84,12 @@ const TabsMessagesIndexRoute = TabsMessagesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TabsMessagesRoute,
 } as any)
+const TabsMessagesConversationIdRoute =
+  TabsMessagesConversationIdRouteImport.update({
+    id: '/$conversationId',
+    path: '/$conversationId',
+    getParentRoute: () => TabsMessagesRoute,
+  } as any)
 const TabsScheduleIndexRoute = TabsScheduleIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof TabsMessagesRouteWithChildren
   '/schedule': typeof TabsScheduleRouteWithChildren
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/groups/': typeof TabsGroupsIndexRoute
   '/messages/': typeof TabsMessagesIndexRoute
@@ -116,6 +124,7 @@ export interface FileRoutesByTo {
   '/me': typeof TabsMeRoute
   '/': typeof TabsIndexRoute
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/groups': typeof TabsGroupsIndexRoute
   '/messages': typeof TabsMessagesIndexRoute
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/_tabs/schedule': typeof TabsScheduleRouteWithChildren
   '/_tabs/': typeof TabsIndexRoute
   '/_tabs/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/_tabs/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/_tabs/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/_tabs/groups/': typeof TabsGroupsIndexRoute
   '/_tabs/messages/': typeof TabsMessagesIndexRoute
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/schedule'
     | '/groups/$groupId'
+    | '/messages/$conversationId'
     | '/schedule/$eventId'
     | '/groups/'
     | '/messages/'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/'
     | '/groups/$groupId'
+    | '/messages/$conversationId'
     | '/schedule/$eventId'
     | '/groups'
     | '/messages'
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/_tabs/schedule'
     | '/_tabs/'
     | '/_tabs/groups/$groupId'
+    | '/_tabs/messages/$conversationId'
     | '/_tabs/schedule/$eventId'
     | '/_tabs/groups/'
     | '/_tabs/messages/'
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsMessagesIndexRouteImport
       parentRoute: typeof TabsMessagesRoute
     }
+    '/_tabs/messages/$conversationId': {
+      id: '/_tabs/messages/$conversationId'
+      path: '/$conversationId'
+      fullPath: '/messages/$conversationId'
+      preLoaderRoute: typeof TabsMessagesConversationIdRouteImport
+      parentRoute: typeof TabsMessagesRoute
+    }
     '/_tabs/schedule/': {
       id: '/_tabs/schedule/'
       path: '/'
@@ -307,10 +327,12 @@ const TabsGroupsRouteWithChildren = TabsGroupsRoute._addFileChildren(
 )
 
 interface TabsMessagesRouteChildren {
+  TabsMessagesConversationIdRoute: typeof TabsMessagesConversationIdRoute
   TabsMessagesIndexRoute: typeof TabsMessagesIndexRoute
 }
 
 const TabsMessagesRouteChildren: TabsMessagesRouteChildren = {
+  TabsMessagesConversationIdRoute: TabsMessagesConversationIdRoute,
   TabsMessagesIndexRoute: TabsMessagesIndexRoute,
 }
 

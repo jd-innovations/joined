@@ -128,6 +128,22 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AuthSync() {
+  const router = useRouter();
+  const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [router, queryClient]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -135,7 +151,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TextSizeProvider>
-          <Outlet />
+          <AuthProvider>
+            <AuthSync />
+            <Outlet />
+          </AuthProvider>
         </TextSizeProvider>
       </ThemeProvider>
     </QueryClientProvider>
