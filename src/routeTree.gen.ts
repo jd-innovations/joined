@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TabsRouteImport } from './routes/_tabs'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TabsIndexRouteImport } from './routes/_tabs/index'
 import { Route as TabsAlertsRouteImport } from './routes/_tabs/alerts'
 import { Route as TabsGroupsRouteImport } from './routes/_tabs/groups'
@@ -24,6 +25,11 @@ import { Route as TabsScheduleEventIdRouteImport } from './routes/_tabs/schedule
 
 const TabsRoute = TabsRouteImport.update({
   id: '/_tabs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TabsIndexRoute = TabsIndexRouteImport.update({
@@ -84,6 +90,7 @@ const TabsScheduleEventIdRoute = TabsScheduleEventIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
+  '/auth': typeof AuthRoute
   '/alerts': typeof TabsAlertsRoute
   '/groups': typeof TabsGroupsRouteWithChildren
   '/marketplace': typeof TabsMarketplaceRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/schedule/': typeof TabsScheduleIndexRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
   '/alerts': typeof TabsAlertsRoute
   '/marketplace': typeof TabsMarketplaceRoute
   '/me': typeof TabsMeRoute
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_tabs/alerts': typeof TabsAlertsRoute
   '/_tabs/groups': typeof TabsGroupsRouteWithChildren
   '/_tabs/marketplace': typeof TabsMarketplaceRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/alerts'
     | '/groups'
     | '/marketplace'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/schedule/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth'
     | '/alerts'
     | '/marketplace'
     | '/me'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_tabs'
+    | '/auth'
     | '/_tabs/alerts'
     | '/_tabs/groups'
     | '/_tabs/marketplace'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -173,6 +186,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof TabsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_tabs/': {
@@ -307,6 +327,7 @@ const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
