@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TabsRouteImport } from './routes/_tabs'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TabsIndexRouteImport } from './routes/_tabs/index'
 import { Route as TabsAlertsRouteImport } from './routes/_tabs/alerts'
 import { Route as TabsGroupsRouteImport } from './routes/_tabs/groups'
@@ -19,11 +20,18 @@ import { Route as TabsMessagesRouteImport } from './routes/_tabs/messages'
 import { Route as TabsScheduleRouteImport } from './routes/_tabs/schedule'
 import { Route as TabsGroupsIndexRouteImport } from './routes/_tabs/groups.index'
 import { Route as TabsGroupsGroupIdRouteImport } from './routes/_tabs/groups.$groupId'
+import { Route as TabsMessagesIndexRouteImport } from './routes/_tabs/messages.index'
+import { Route as TabsMessagesConversationIdRouteImport } from './routes/_tabs/messages.$conversationId'
 import { Route as TabsScheduleIndexRouteImport } from './routes/_tabs/schedule.index'
 import { Route as TabsScheduleEventIdRouteImport } from './routes/_tabs/schedule.$eventId'
 
 const TabsRoute = TabsRouteImport.update({
   id: '/_tabs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TabsIndexRoute = TabsIndexRouteImport.update({
@@ -71,6 +79,17 @@ const TabsGroupsGroupIdRoute = TabsGroupsGroupIdRouteImport.update({
   path: '/$groupId',
   getParentRoute: () => TabsGroupsRoute,
 } as any)
+const TabsMessagesIndexRoute = TabsMessagesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TabsMessagesRoute,
+} as any)
+const TabsMessagesConversationIdRoute =
+  TabsMessagesConversationIdRouteImport.update({
+    id: '/$conversationId',
+    path: '/$conversationId',
+    getParentRoute: () => TabsMessagesRoute,
+  } as any)
 const TabsScheduleIndexRoute = TabsScheduleIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -84,47 +103,56 @@ const TabsScheduleEventIdRoute = TabsScheduleEventIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
+  '/auth': typeof AuthRoute
   '/alerts': typeof TabsAlertsRoute
   '/groups': typeof TabsGroupsRouteWithChildren
   '/marketplace': typeof TabsMarketplaceRoute
   '/me': typeof TabsMeRoute
-  '/messages': typeof TabsMessagesRoute
+  '/messages': typeof TabsMessagesRouteWithChildren
   '/schedule': typeof TabsScheduleRouteWithChildren
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/groups/': typeof TabsGroupsIndexRoute
+  '/messages/': typeof TabsMessagesIndexRoute
   '/schedule/': typeof TabsScheduleIndexRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
   '/alerts': typeof TabsAlertsRoute
   '/marketplace': typeof TabsMarketplaceRoute
   '/me': typeof TabsMeRoute
-  '/messages': typeof TabsMessagesRoute
   '/': typeof TabsIndexRoute
   '/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/groups': typeof TabsGroupsIndexRoute
+  '/messages': typeof TabsMessagesIndexRoute
   '/schedule': typeof TabsScheduleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_tabs/alerts': typeof TabsAlertsRoute
   '/_tabs/groups': typeof TabsGroupsRouteWithChildren
   '/_tabs/marketplace': typeof TabsMarketplaceRoute
   '/_tabs/me': typeof TabsMeRoute
-  '/_tabs/messages': typeof TabsMessagesRoute
+  '/_tabs/messages': typeof TabsMessagesRouteWithChildren
   '/_tabs/schedule': typeof TabsScheduleRouteWithChildren
   '/_tabs/': typeof TabsIndexRoute
   '/_tabs/groups/$groupId': typeof TabsGroupsGroupIdRoute
+  '/_tabs/messages/$conversationId': typeof TabsMessagesConversationIdRoute
   '/_tabs/schedule/$eventId': typeof TabsScheduleEventIdRoute
   '/_tabs/groups/': typeof TabsGroupsIndexRoute
+  '/_tabs/messages/': typeof TabsMessagesIndexRoute
   '/_tabs/schedule/': typeof TabsScheduleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/alerts'
     | '/groups'
     | '/marketplace'
@@ -132,23 +160,28 @@ export interface FileRouteTypes {
     | '/messages'
     | '/schedule'
     | '/groups/$groupId'
+    | '/messages/$conversationId'
     | '/schedule/$eventId'
     | '/groups/'
+    | '/messages/'
     | '/schedule/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth'
     | '/alerts'
     | '/marketplace'
     | '/me'
-    | '/messages'
     | '/'
     | '/groups/$groupId'
+    | '/messages/$conversationId'
     | '/schedule/$eventId'
     | '/groups'
+    | '/messages'
     | '/schedule'
   id:
     | '__root__'
     | '/_tabs'
+    | '/auth'
     | '/_tabs/alerts'
     | '/_tabs/groups'
     | '/_tabs/marketplace'
@@ -157,13 +190,16 @@ export interface FileRouteTypes {
     | '/_tabs/schedule'
     | '/_tabs/'
     | '/_tabs/groups/$groupId'
+    | '/_tabs/messages/$conversationId'
     | '/_tabs/schedule/$eventId'
     | '/_tabs/groups/'
+    | '/_tabs/messages/'
     | '/_tabs/schedule/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -173,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof TabsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_tabs/': {
@@ -238,6 +281,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsGroupsGroupIdRouteImport
       parentRoute: typeof TabsGroupsRoute
     }
+    '/_tabs/messages/': {
+      id: '/_tabs/messages/'
+      path: '/'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof TabsMessagesIndexRouteImport
+      parentRoute: typeof TabsMessagesRoute
+    }
+    '/_tabs/messages/$conversationId': {
+      id: '/_tabs/messages/$conversationId'
+      path: '/$conversationId'
+      fullPath: '/messages/$conversationId'
+      preLoaderRoute: typeof TabsMessagesConversationIdRouteImport
+      parentRoute: typeof TabsMessagesRoute
+    }
     '/_tabs/schedule/': {
       id: '/_tabs/schedule/'
       path: '/'
@@ -269,6 +326,20 @@ const TabsGroupsRouteWithChildren = TabsGroupsRoute._addFileChildren(
   TabsGroupsRouteChildren,
 )
 
+interface TabsMessagesRouteChildren {
+  TabsMessagesConversationIdRoute: typeof TabsMessagesConversationIdRoute
+  TabsMessagesIndexRoute: typeof TabsMessagesIndexRoute
+}
+
+const TabsMessagesRouteChildren: TabsMessagesRouteChildren = {
+  TabsMessagesConversationIdRoute: TabsMessagesConversationIdRoute,
+  TabsMessagesIndexRoute: TabsMessagesIndexRoute,
+}
+
+const TabsMessagesRouteWithChildren = TabsMessagesRoute._addFileChildren(
+  TabsMessagesRouteChildren,
+)
+
 interface TabsScheduleRouteChildren {
   TabsScheduleEventIdRoute: typeof TabsScheduleEventIdRoute
   TabsScheduleIndexRoute: typeof TabsScheduleIndexRoute
@@ -288,7 +359,7 @@ interface TabsRouteChildren {
   TabsGroupsRoute: typeof TabsGroupsRouteWithChildren
   TabsMarketplaceRoute: typeof TabsMarketplaceRoute
   TabsMeRoute: typeof TabsMeRoute
-  TabsMessagesRoute: typeof TabsMessagesRoute
+  TabsMessagesRoute: typeof TabsMessagesRouteWithChildren
   TabsScheduleRoute: typeof TabsScheduleRouteWithChildren
   TabsIndexRoute: typeof TabsIndexRoute
 }
@@ -298,7 +369,7 @@ const TabsRouteChildren: TabsRouteChildren = {
   TabsGroupsRoute: TabsGroupsRouteWithChildren,
   TabsMarketplaceRoute: TabsMarketplaceRoute,
   TabsMeRoute: TabsMeRoute,
-  TabsMessagesRoute: TabsMessagesRoute,
+  TabsMessagesRoute: TabsMessagesRouteWithChildren,
   TabsScheduleRoute: TabsScheduleRouteWithChildren,
   TabsIndexRoute: TabsIndexRoute,
 }
@@ -307,6 +378,7 @@ const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

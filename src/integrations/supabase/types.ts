@@ -210,9 +210,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      conversation_overview: {
+        Args: never
+        Returns: {
+          id: string
+          last_message_at: string
+          last_message_body: string
+          last_message_has_image: boolean
+          last_message_sender_id: string
+          member_count: number
+          other_avatar_url: string
+          other_display_name: string
+          other_user_id: string
+          team_key: string
+          title: string
+          type: Database["public"]["Enums"]["conversation_type"]
+          unread_count: number
+        }[]
+      }
+      get_or_create_direct_conversation: {
+        Args: { _other_user_id: string }
+        Returns: string
+      }
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
+      }
+      join_team_conversation: {
+        Args: { _team_key: string; _title: string }
+        Returns: string
       }
     }
     Enums: {
