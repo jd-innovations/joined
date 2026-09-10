@@ -25,13 +25,54 @@ const TEXT_SIZES: { value: TextSize; label: string; glyphPx: number }[] = [
 function MePage() {
   const { theme, setTheme } = useTheme();
   const { textSize, setTextSize } = useTextSize();
+  const { user, profile } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 py-6">
       <h1 className="text-2xl font-bold text-foreground">Me</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Profile, wallet, and settings coming next.
-      </p>
+
+      <div className="mt-4 flex items-center gap-3 rounded-2xl bg-surface-secondary p-4">
+        <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-surface-tertiary text-sm font-semibold text-on-surface-secondary">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initials(profile?.display_name ?? "Guest")
+          )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {profile?.display_name ?? (user ? "Member" : "Not signed in")}
+          </p>
+          <p className="truncate text-xs text-on-surface-tertiary">
+            {user?.email ?? "Sign in to chat with your teams"}
+          </p>
+        </div>
+        {user ? (
+          <button
+            onClick={() => void handleSignOut()}
+            className="flex items-center gap-1.5 rounded-xl bg-surface-tertiary px-3 py-2 text-xs font-semibold text-on-surface-secondary"
+          >
+            <LogOut className="h-3.5 w-3.5" /> Sign out
+          </button>
+        ) : (
+          <Link
+            to="/auth"
+            className="rounded-xl bg-brand-primary px-3 py-2 text-xs font-semibold text-on-brand-primary"
+          >
+            Sign in
+          </Link>
+        )}
+      </div>
+
 
       <div className="mt-6 rounded-2xl bg-surface-secondary p-4">
         <p className="text-sm font-semibold text-foreground">Appearance</p>
