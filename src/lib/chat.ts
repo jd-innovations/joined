@@ -105,15 +105,19 @@ export async function fetchReactions(conversationId: string): Promise<Reaction[]
 }
 
 export async function fetchMembers(conversationId: string): Promise<Person[]> {
-  const { data, error } = await supabase
+  const { data: memberRows, error: memberError } = await supabase
     .from("conversation_members")
-    .select("user_id, profiles:profiles!inner(id, display_name, avatar_url)")
+    .select("user_id")
     .eq("conversation_id", conversationId);
+  if (memberError) throw memberError;
+  const ids = (memberRows ?? []).map((r) => r.user_id);
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, avatar_url")
+    .in("id", ids);
   if (error) throw error;
-  type Row = { profiles: Person | null };
-  return ((data ?? []) as unknown as Row[])
-    .map((r) => r.profiles)
-    .filter((p): p is Person => Boolean(p));
+  return (data ?? []) as Person[];
 }
 
 export async function fetchPeople(excludeUserId: string): Promise<Person[]> {
