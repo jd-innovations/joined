@@ -1,7 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Moon, Sun, Monitor } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Moon, Sun, Monitor, LogOut } from "lucide-react";
 import { useTheme } from "../../lib/theme";
 import { useTextSize, type TextSize } from "../../lib/text-size";
+import { useAuth } from "../../lib/auth";
+import { initials } from "../../lib/chat";
+import { supabase } from "../../integrations/supabase/client";
 
 export const Route = createFileRoute("/_tabs/me")({
   head: () => ({
