@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../lib/theme";
 import { TextSizeProvider } from "../lib/text-size";
+import { AuthProvider } from "../lib/auth";
+import { supabase } from "../integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
